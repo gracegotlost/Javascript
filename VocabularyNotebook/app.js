@@ -18,8 +18,7 @@ var fs = require('fs');
 //Urban Dictionary API
 /*================================*/
 var urban = require('urban');
-// var urban = require('urban'),
-//     trollface = urban('trollface');
+// var trollface = urban('ddddd');
 
 // trollface.first(function(json) {
 //     console.log(json);
@@ -62,17 +61,8 @@ app.get('/words', function(req, res) {
         }
         data = JSON.parse(data);
 
-        //Get definition from Urban Dictionary
-        /*=============================*/
         // console.log(data);
-        data.forEach(function(element, index, array){
-            var word = urban(element.title);
-            word.first(function(json){
-                console.log(json.definition);
-            });
-        });
-        // console.log(data);
-        /*=============================*/
+
         res.json({
             data: data
         });
@@ -86,16 +76,77 @@ app.get('/word', function(req, res) {
 
 // Create a project
 app.post('/word', function(req, res) {
-    console.log(req.body);
+    // console.log(req.body);
     // First we have to read a user's file and parse it in a proper array format
     fs.readFile(PATH_TO_JSON_FILE + '/' + req.body.user, 'utf8', function(err, data) {
         data = JSON.parse(data);
-        // Prepend a new json object into `data` array using `.unshift`
-        data.unshift({
-            id: new Date().getTime(),
-            title: req.body.p_title,
-            done: false
+        
+         //Get definition from Urban Dictionary
+        /*=============================*/
+        var word;
+        var wordDef;
+        word = urban(req.body.p_title);
+        word.first(function(json){
+            if(json != undefined){
+                // console.log('has such word');
+                wordDef = json.definition;
+
+                //change re-write function position
+                /*=====================*/
+                 // Prepend a new json object into `data` array using `.unshift`
+                data.unshift({
+                    id: new Date().getTime(),
+                    title: req.body.p_title,
+                    definition: wordDef,
+                    done: 'New'
+                });
+                // Re-write the file
+                fs.writeFile(PATH_TO_JSON_FILE + '/' + req.body.user, JSON.stringify(data), function(err) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("The file was saved!");
+                        // res.json({
+                        //     status: 'OK'
+                        // });
+                    }
+                });
+                /*=====================*/
+                res.json({
+                    hasWord: true
+                });
+
+            } else {
+                // console.log('no such word');
+                res.json({
+                    hasWord: false
+                });
+            }
+
         });
+        /*=============================*/
+
+    });
+});
+
+// Update a project
+app.put('/word', function(req, res) {
+    // Put the status of Done into txt file
+    fs.readFile(PATH_TO_JSON_FILE + '/' + req.body.user, 'utf8', function(err, data) {
+        data = JSON.parse(data);
+
+        data.forEach(function(item){
+            if(item.id == req.body.id){
+                if(req.body.done == 'New'){
+                    item.done = 'Old';
+                } else {
+                    item.done = 'New';
+                }
+
+            }
+        });
+
+        // console.log(data);
         // Re-write the file
         fs.writeFile(PATH_TO_JSON_FILE + '/' + req.body.user, JSON.stringify(data), function(err) {
             if (err) {
@@ -110,25 +161,20 @@ app.post('/word', function(req, res) {
     });
 });
 
-// Update a project
-app.put('/word', function(req, res) {
-
-});
-
 // Delete a project
 app.delete('/word', function(req, res) {
-    console.log('deleting ' + req.body.id);
+    // console.log('deleting ' + req.body.id);
     // Read and find id
     fs.readFile(PATH_TO_JSON_FILE + '/' + req.body.user, 'utf8', function(err, data) {
         data = JSON.parse(data);
         data.forEach(function(item) {
             if (item.id == req.body.id) {
-                console.log(item);
+                // console.log(item);
                 data.splice(data.indexOf(item), 1);
             }
         });
-        console.log('AFTER vvv');
-        console.log(data);
+        // console.log('AFTER vvv');
+        // console.log(data);
         // Re-write the file
         fs.writeFile(PATH_TO_JSON_FILE + '/' + req.body.user, JSON.stringify(data), function(err) {
             if (err) {
@@ -145,7 +191,7 @@ app.delete('/word', function(req, res) {
 
 // Bonus!
 app.post('/register', function(req, res) {
-    console.log(req.body);
+    // console.log(req.body);
     // Create an empty file for this user (if not exist)
     // http://stackoverflow.com/questions/4482686/check-synchronously-if-file-directory-exists-in-node-js
     if (!fs.existsSync(PATH_TO_JSON_FILE + '/' + req.body.email)) {

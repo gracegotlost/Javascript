@@ -26,7 +26,8 @@ var hashRouter = function() {
         } else if (location.hash == '#words') {
             renderWords();
         } else if (location.hash == '#create') {
-            renderCreate();
+            var sentence = "Please add word.";
+            renderCreate(sentence);
         }
         attachEvents();
     });
@@ -42,7 +43,7 @@ var attachEvents = function() {
         $.post('/register', {
             email: $('#iptEmailRegister').val()
         }, function(result) {
-            console.log(result.email);
+            // console.log(result.email);
             localStorage['user'] = result.email;
             //alert('Registered');
             // Assuming the email has been through the registeration process
@@ -57,12 +58,25 @@ var attachEvents = function() {
     });
     // submit button
     $('#btnSubmit').off('click').on('click', function() {
-        $.post('/word', {
-            user: localStorage['user'],
-            p_title: $('#iptProjectTitle').val()
-        }, function(result) {
-            //console.log(result);
-            location.hash = '#words';
+        $.ajax({
+            url: '/word',
+            type: 'POST',
+            data: {
+                user: localStorage['user'],
+                p_title: $('#iptProjectTitle').val()
+            },
+            success: function(result) {
+                // console.log(result);
+                if(result.hasWord){
+                    // console.log('has such word');
+                    location.hash = '#words';
+                } else {
+                    // console.log('no such word');
+                    var sentence = "Sorry there is no such word, please add another one.";
+                    renderCreate(sentence);
+                    attachEvents();
+                }
+            }
         });
     });
     // delete button
@@ -84,6 +98,24 @@ var attachEvents = function() {
             }
         });
     });
+
+    // update button
+    $('.btnUpdate').off('click').on('click', function(){
+        $.ajax({
+            url: '/word',
+            type: 'PUT',
+            data: {
+                user:  localStorage['user'],
+                id: $(this).siblings().attr('data-id'),
+                done: $('.btnUpdate').html()
+            },
+            success: function(result){
+                // console.log("success!");
+                location.reload();
+            }
+        });
+    });
+
     // Log out --> localStorage.clear()
     $('#btnLogout').on('click', function() {
         localStorage.clear();
@@ -127,12 +159,13 @@ var renderWords = function() {
     });
 };
 
-var renderCreate = function() {
+var renderCreate = function(sentence) {
     // This is how we compile underscore template
     // Usually, it may be applied to other template brands as well
     var tplToCompile = $('#tpl_create').html();
     var compiled = _.template(tplToCompile, {
-        title: 'Daily Vocabulary',
+        title: 'Create',
+        sentence: sentence,
         date: new Date()
     });
     $('#view').html(compiled);
