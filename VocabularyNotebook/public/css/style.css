@@ -1,17 +1,70 @@
 /* your style begins here */
 body {
-	background: #cfd3c9;
+	background: #000000;
+	color: #FFFF00;
 }
 
-footer {
-	position: fixed;
-	bottom: 20px;
-	left: 0px;
-	z-index: 9;
-	width: 100%;
-	text-align: center;
+h2 {
+	font-size: 40px;
+}
+
+li{
+	list-style-type: none;
+}
+
+ul{
+	width: 80%;
+	padding-left: 60px;
+}
+
+.word {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.definition {
+	font-size: 15px;
+}
+
+.button {
+	background-color:#ffff00;
+	color:#000000;
+	font-size:18px;
+	font-weight:bold;
+	border: 0;
+}
+
+.button:hover {
+	background-color:#000000;
+	color: #ffff00;
 }
 
 .page {
-	padding: 20px;
+	padding-top: 30%;
+	text-align: center;
+}
+
+.pageProject {
+	top: 20px;
+	padding-left: 20px;
+	text-align: left;
+}
+
+.btnUpdate {
+	margin-left: 2%;
+}
+
+.btnDelete {
+	margin-left: 100%;
+}
+
+#view {
+	line-height: 130%;
+}
+
+#btnCreate {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	font-size: 50px;
 }

@@ -34,7 +34,7 @@ var hashRouter = function() {
 };
 
 // A function where we keep all user's interaction listener (buttons, etc)
-var attachEvents = function() {
+var attachEvents = function() {     
     //console.log('Attaching Events');
 
     // register page
@@ -111,7 +111,9 @@ var attachEvents = function() {
             },
             success: function(result){
                 // console.log("success!");
-                location.reload();
+                // location.reload();
+                renderWords();
+                attachEvents();
             }
         });
     });

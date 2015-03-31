@@ -137,10 +137,13 @@ app.put('/word', function(req, res) {
 
         data.forEach(function(item){
             if(item.id == req.body.id){
+                // console.log(req.body.done);
                 if(req.body.done == 'New'){
                     item.done = 'Old';
+                    // console.log("changed to old");
                 } else {
                     item.done = 'New';
+                    // console.log("changed to new");
                 }
 
             }
@@ -152,7 +155,7 @@ app.put('/word', function(req, res) {
             if (err) {
                 console.log(err);
             } else {
-                console.log("The file was saved!");
+                // console.log("The file was saved!");
                 res.json({
                     status: 'OK'
                 });

@@ -10,10 +10,6 @@
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-	<!-- Fixed Footer -->
-	<footer>
-		<button id="btnCreate">+ Add A</button>
-	</footer>
 	<!-- View container where pages are rendered -->
 	<div id="view"></div>
 
@@ -21,26 +17,27 @@
 	<script type="text/html" id="tpl_register">
 		<div class="page" id="register">
 			<h2><%= title %></h2>
-			<input id="iptEmailRegister" type="text" placeholder="Enter your email address">
-			<button id="btnRegister">LogIn</button>
+			<input id="iptEmailRegister" type="text" placeholder="Enter your username" size="30">
+			<button class="button" id="btnRegister">LogIn</button>
 		</div>
 	</script>
 
 	<!-- Template for Projects page -->
 	<script type="text/html" id="tpl_projects">
-		<div class="page" id="projects">
-			<h5>Logged in as <%= user %> | <button id="btnLogout">Log out</button></h5>
+		<div class="pageProject" id="projects">
+			<h5>Logged in as <%= user %> | <button class="button" id="btnLogout">Log out</button></h5>
+			<button class="button" id="btnCreate">+ Word</button>
 			<h2><%= title %></h2>
 			<% if(data.length > 0) { %>
 			<% _.each(data, function(item) { %>
-				<li>
+				<ul class="word">
 					<span class="item" data-id="<%= item.id %>"><%= item.title %></span>
-					<button class="btnUpdate" data-id="<%= item.id %>"><%= item.done %></button>
-					<button class="btnDelete"> X </button>
-				</li>
-				<li>
+					<button class="btnUpdate button" data-id="<%= item.id %>"><%= item.done %></button>
+					<button class="btnDelete button"> X </button>
+				</ul>
+				<ul class="definition">
 					<span class="item" data-id="<%= item.id %>"><%= item.definition %></span>
-				</li>
+				</ul>
 			<% }); %>
 			<% } else { %>
 				<h4>No words yet. Please add more.</h4>
@@ -54,8 +51,7 @@
 		<div class="page" id="create">
 			<h2><%= title %></h2>
 			<input type="text" placeholder="Enter Word" id="iptProjectTitle">
-			<br>
-			<button id="btnSubmit">Submit</button>
+			<button class="button" id="btnSubmit">Submit</button>
 			<h4><%= sentence %></h4>
 		</div>
 	</script>
