@@ -1,0 +1,26 @@
+{
+  "name": "DuoJump",
+  "version": "1.0.0",
+  "description": "this is a webapp for Javascript final project with Xue Feng",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gracegotlost/Javascript"
+  },
+  "keywords": [
+    "socketio",
+    "game"
+  ],
+  "author": "Eliana Xue Feng, Grace Tingshan Gou",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gracegotlost/Javascript/issues"
+  },
+  "homepage": "https://github.com/gracegotlost/Javascript",
+  "dependencies": {
+    "socket.io": "^1.3.5"
+  }
+}
