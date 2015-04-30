@@ -14,12 +14,14 @@ var number = 0;
 io.on('connection', function(socket){
 	socket.on('join game', function(user){
 		if(number == 0){
+			//not working
 			io.to(user.username).emit('start game', {
 				role: 'bunny'
 			});
 			number++;
 			console.log("bunny is in the room");
 		} else if (number == 1) {
+			//not working
 			io.to(user.username).emit('start game', {
 				role: 'crow'
 			});
@@ -30,6 +32,13 @@ io.on('connection', function(socket){
 
 	socket.on('crow', function(data){
 		socket.broadcast.emit('crowPos', {
+			x: data.x,
+			y: data.y
+		});
+	});
+
+	socket.on('bunny', function(data){
+		socket.broadcast.emit('bunnyPos', {
 			x: data.x,
 			y: data.y
 		});
