@@ -1,0 +1,17 @@
+html, body {
+	margin: 0;
+	padding-top: 2%;
+}
+
+#myCanvas{
+	width: 621px;
+	height: 1104px;
+	background: url("/img/bg.png");
+}
+
+.container{
+	position: absolute;
+	width: 621px;
+	padding: 0;
+}
+
