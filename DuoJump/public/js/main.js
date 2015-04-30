@@ -89,6 +89,7 @@ app.init = function() {
 			//MOVE BUNNY IN CLIENT SIDE
 			// KEY W
 			if ( evt.keyCode == 87 ) {
+				//clear only the image
 				ctx.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
 				bunnyPosY -= 10;
 				bunny.onload();
