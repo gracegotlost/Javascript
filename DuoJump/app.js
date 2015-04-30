@@ -27,4 +27,11 @@ io.on('connection', function(socket){
 			console.log("crow is in the room");
 		}
 	});
+
+	socket.on('crow', function(data){
+		socket.broadcast.emit('crowPos', {
+			x: data.x,
+			y: data.y
+		});
+	});
 });

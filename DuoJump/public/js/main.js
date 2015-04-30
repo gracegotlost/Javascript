@@ -62,19 +62,32 @@ app.init = function() {
 			ctx.drawImage(crow, cx, cy);
 		};
 
-
+		//ADD CROW IN SERVER SIDE
+		socket.emit('crow', {
+			x: cx,
+			y: cy
+		});
 
 		// console.log(cx + ' ' + cy);
 	}, false);
 
 	//SOCKET IO
 	socket.on('start game', function(user){
-		if(user.role == "bunny"){
-			name = bunny;
+		if(user.role == 'bunny'){
+			name = 'bunny';
 		}
-		if(user.role == "crow"){
-			name = crow;
+		if(user.role == 'crow'){
+			name = 'crow';
 		}
+	});
+
+	socket.on('crowPos', function(data){
+		var crow = new Image();
+		crow.src = '/img/crow.png';
+		crow.onload = function() {
+			ctx.drawImage(crow, data.x, data.y);
+		};
+		// console.log(data.x + ' ' + data.y);
 	});
 	
 };
