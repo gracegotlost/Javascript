@@ -28,16 +28,6 @@ app.init = function() {
 		ctx.drawImage(img, 0, 0);
 	};
 
-	//SHOULD BE ADDED IN SOCKET "START GAME"
-	var bunnyPosX = 100,
-		bunnyPosY = 550;
-	var bunny = new Image();
-	bunny.src = '/img/bunny.png';
-	bunny.onload = function() {
-		ctx.drawImage(bunny, bunnyPosX, bunnyPosY);
-	};
-	////////////////////////////////////////
-
 	//JQUERY EVENTS
 	var attachEvents = function() {
 		$( window ).resize(function() {
@@ -60,20 +50,20 @@ app.init = function() {
 
 	//CANVAS EVENT LISTENER
 	c.addEventListener('click', function(evt){
-		if(name == 'crow'){
+		if(name == 'cloud'){
 			//ADD CROW IN CLIENT SIDE
 			var container = c.getBoundingClientRect();
 	 		var cx = evt.clientX - container.left * (c.width  / container.width),
 		        cy = evt.clientY - container.top  * (c.height / container.height)
 
-			var crow = new Image();
-			crow.src = '/img/crow.png';
-			crow.onload = function() {
-				ctx.drawImage(crow, cx, cy);
+			var cloud = new Image();
+			cloud.src = '/img/cloud.png';
+			cloud.onload = function() {
+				ctx.drawImage(cloud, cx, cy);
 			};
 
 			//ADD CROW IN SERVER SIDE
-			socket.emit('crow', {
+			socket.emit('cloud', {
 				x: cx,
 				y: cy
 			});
@@ -125,21 +115,29 @@ app.init = function() {
 	socket.on('start game', function(user){
 		if(user.role == 'bunny'){
 			name = 'bunny';
+			// console.log("this user is bunny");
 		}
-		if(user.role == 'crow'){
-			name = 'crow';
+		if(user.role == 'cloud'){
+			name = 'cloud';
+			// console.log("this user is cloud");
 		}
 
-		//ADD BUNNY IN CANVAS HERE
+		var bunnyPosX = 100,
+			bunnyPosY = 550;
+		var bunny = new Image();
+		bunny.src = '/img/bunny.png';
+		bunny.onload = function() {
+			ctx.drawImage(bunny, bunnyPosX, bunnyPosY);
+		};
 
-		console.log('role: ' + user.role);
+		// console.log('role: ' + user.role);
 	});
 
-	socket.on('crowPos', function(data){
-		var crow = new Image();
-		crow.src = '/img/crow.png';
-		crow.onload = function() {
-			ctx.drawImage(crow, data.x, data.y);
+	socket.on('cloudPos', function(data){
+		var cloud = new Image();
+		cloud.src = '/img/cloud.png';
+		cloud.onload = function() {
+			ctx.drawImage(cloud, data.x, data.y);
 		};
 		// console.log(data.x + ' ' + data.y);
 	});
