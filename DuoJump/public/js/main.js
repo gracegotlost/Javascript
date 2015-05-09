@@ -10,6 +10,12 @@ app.init = function() {
 		$("#myCanvas").css("left",ww/2-w/2);
 	};
 
+	//BUNNY INIT
+	var bunnyPosX = 100,
+		bunnyPosY = 550;
+	var bunny = new Image();
+	bunny.src = '/img/bunny.png';
+
 	//SOCKET INIT
 	var socket;
 	socket = io.connect();
@@ -122,10 +128,6 @@ app.init = function() {
 			// console.log("this user is cloud");
 		}
 
-		var bunnyPosX = 100,
-			bunnyPosY = 550;
-		var bunny = new Image();
-		bunny.src = '/img/bunny.png';
 		bunny.onload = function() {
 			ctx.drawImage(bunny, bunnyPosX, bunnyPosY);
 		};
