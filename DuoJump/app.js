@@ -48,4 +48,11 @@ io.on('connection', function(socket){
 			y: data.y
 		});
 	});
+
+	socket.on('bunny jump', function(data){
+		socket.broadcast.emit('jumpPos', {
+			x: data.x,
+			y: data.y
+		});
+	});
 });
