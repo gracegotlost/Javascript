@@ -69,6 +69,11 @@ app.init = function() {
 		ctx4.drawImage(bunny, bunnyPosX, bunnyPosY);
 	};
 
+	//CLOUD VAR
+	var cloudCount = [];
+	var cloudWidth = 170;
+	var cloudHeight = 98;
+
 	//JQUERY EVENTS
 	var attachEvents = function() {
 		$( window ).resize(function() {
@@ -93,26 +98,41 @@ app.init = function() {
 	//CANVAS EVENT LISTENER
 	window.addEventListener('click', function(evt){
 		if(name == 'cloud'){
-			//ADD CROW IN CLIENT SIDE
 			var container = c3.getBoundingClientRect();
 	 		var cx = evt.clientX - container.left * (c3.width  / container.width),
 		        cy = evt.clientY - container.top  * (c3.height / container.height)
 
-			cx = cx - 170/2;
-			cy = cy - 98/2;
-			var cloud = new Image();
+			cx = cx - cloudWidth/2; //cloud.width
+			cy = cy - cloudHeight/2;  //cloud.height
+
+		    var cloud = new Image();
 			cloud.src = '/img/cloud.png';
 			cloud.onload = function() {
+				//ADD CLOUD IN CLIENT SIDE
 				ctx3.drawImage(cloud, cx, cy);
 			};
 
-			//ADD CROW IN SERVER SIDE
+			//ADD CLOUD IN SERVER SIDE
 			socket.emit('cloud', {
 				x: cx,
 				y: cy
 			});
 
-			// console.log(cx + ' ' + cy);
+			//WHETHER REMOVE OLD ONE
+			cloudCount[cloudCount.length] = {x: cx, y: cy};
+
+			if(cloudCount.length > 2){
+				//REMOVE CLOUD IN CLIENT SIDE
+				ctx3.clearRect(cloudCount[0].x, cloudCount[0].y, cloud.width, cloud.height);
+				//REMOVE CLOUD IN SERVER SIDE
+				socket.emit('cloud remove', {
+					x: cloudCount[0].x,
+					y: cloudCount[0].y
+				});
+				//REMOVE ELEMENT FROM ARRAY
+				cloudCount.splice(0, 1);
+			}
+
 		} else {
 			console.log(name);
 		}
@@ -176,6 +196,10 @@ app.init = function() {
 			ctx3.drawImage(cloud, data.x, data.y);
 		};
 		// console.log(data.x + ' ' + data.y);
+	});
+
+	socket.on('removePos', function(data){
+		ctx3.clearRect(data.x, data.y, cloudWidth, cloudHeight);
 	});
 
 	socket.on('bunnyPos', function(data){

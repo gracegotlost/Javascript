@@ -35,6 +35,13 @@ io.on('connection', function(socket){
 		});
 	});
 
+	socket.on('cloud remove', function(data){
+		socket.broadcast.emit('removePos', {
+			x: data.x,
+			y: data.y
+		});
+	});
+
 	socket.on('bunny', function(data){
 		socket.broadcast.emit('bunnyPos', {
 			x: data.x,
