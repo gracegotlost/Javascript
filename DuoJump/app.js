@@ -14,14 +14,12 @@ var number = 0;
 io.on('connection', function(socket){
 	socket.on('join game', function(user){
 		if(number == 0){
-			//not working
 			io.to(socket.id).emit('start game', {
 				role: 'bunny'
 			});
 			number++;
 			console.log("bunny is in the room");
 		} else if (number == 1) {
-			//not working
 			io.to(socket.id).emit('start game', {
 				role: 'cloud'
 			});
