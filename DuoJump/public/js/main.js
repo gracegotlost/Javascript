@@ -153,6 +153,9 @@ app.init = function() {
 			if ( evt.keyCode == 65 || evt.keyCode == 37 ) {
 				ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
 				bunnyPosX -= xVel ;
+				if(bunnyPosX < 0 - bunny.width){
+					bunnyPosX = c4.width;
+				}
 				bunny.onload();
 				moveLeft = true;
 			}
@@ -160,6 +163,9 @@ app.init = function() {
 			if ( evt.keyCode == 68 || evt.keyCode == 39) {
 				ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
 				bunnyPosX += xVel ;
+				if(bunnyPosX > c4.width){
+					bunnyPosX = 0 - bunny.width;
+				}
 				bunny.onload();
 				moveRight = true;
 			}
@@ -201,9 +207,15 @@ app.init = function() {
 			//MOVE X
 			if(moveLeft){
 				bunnyPosX -= xVel;
+				if(bunnyPosX < 0 - bunny.width){
+					bunnyPosX = c4.width;
+				}
 			}
 			if(moveRight){
 				bunnyPosX += xVel;
+				if(bunnyPosX > c4.width){
+					bunnyPosX = 0 - bunny.width;
+				}
 			}
 			//MOVE Y
 			yVel += gravity;
