@@ -227,6 +227,7 @@ app.init = function() {
 				} else if(isJumping == false){
 					yVel += gravity;
 					bunnyPosY += yVel;
+					isJumping = true;
 					ctx4.clearRect(0, 0, c4.width, c4.height);
 					bunny.onload();
 				}
