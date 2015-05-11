@@ -40,14 +40,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('bunny', function(data){
-		io.emit('bunnyPos', {
-			x: data.x,
-			y: data.y
-		});
-	});
-
-	socket.on('bunny jump', function(data){
-		socket.broadcast.emit('jumpPos', {
+		socket.broadcast.emit('bunnyPos', {
 			x: data.x,
 			y: data.y
 		});

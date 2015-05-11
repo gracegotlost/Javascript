@@ -85,6 +85,7 @@ app.init = function() {
 	var isJumping = false;
 	var moveLeft = false;
 	var moveRight = false;
+	var hasStage = false;
 
 	//JQUERY EVENTS
 	var attachEvents = function() {
@@ -107,133 +108,127 @@ app.init = function() {
 
 	attachEvents();
 
-	//CANVAS EVENT LISTENER
-	window.addEventListener('click', function(evt){
+	var cloudClick = function(){
 		if(name == 'cloud'){
-			var container = c3.getBoundingClientRect();
-	 		var cx = evt.clientX - container.left * (c3.width  / container.width),
-		        cy = evt.clientY - container.top  * (c3.height / container.height)
+			//CANVAS EVENT LISTENER
+			window.addEventListener('click', function(evt){
+				var container = c3.getBoundingClientRect();
+		 		var cx = evt.clientX - container.left * (c3.width  / container.width),
+			        cy = evt.clientY - container.top  * (c3.height / container.height)
 
-			cx = cx - cloudWidth/2; 
-			cy = cy - cloudHeight/2;
+				cx = cx - cloudWidth/2; 
+				cy = cy - cloudHeight/2;
 
-			cloudCount[cloudCount.length] = {x: cx, y: cy};
+				cloudCount[cloudCount.length] = {x: cx, y: cy};
 
-			//ADD CLOUD IN SERVER SIDE
-			socket.emit('cloud', {
-				cloud: cloudCount
-			});
-
-		} else {
-			console.log(name);
+				//ADD CLOUD IN SERVER SIDE
+				socket.emit('cloud', {
+					cloud: cloudCount
+				});
+			}, false);
 		}
-	}, false);
+	}();
+	
 
-	window.addEventListener('keydown', function(evt){
+	var bunnyMove = function(){
 		if(name == 'bunny'){
-			// KEY A
-			if ( evt.keyCode == 65 || evt.keyCode == 37 ) {
-				bunnyPosX -= xVel ;
-				if(bunnyPosX < 0 - bunny.width){
-					bunnyPosX = c4.width;
+			window.addEventListener('keydown', function(evt){
+				// KEY A
+				if ( evt.keyCode == 65 || evt.keyCode == 37 ) {
+					moveLeft = true;
 				}
-				moveLeft = true;
-			}
-			// KEY D
-			if ( evt.keyCode == 68 || evt.keyCode == 39) {
-				bunnyPosX += xVel ;
-				if(bunnyPosX > c4.width){
-					bunnyPosX = 0 - bunny.width;
+				// KEY D
+				if ( evt.keyCode == 68 || evt.keyCode == 39) {
+					moveRight = true;
 				}
-				moveRight = true;
-			}
-			// SPACE BAR
-			if (evt.keyCode == 32) {
-				if(isJumping == false){
-					yVel = -15;
-					isJumping = true;
+				// SPACE BAR
+				if (evt.keyCode == 32) {
+					if(isJumping == false){
+						yVel = -15;
+						isJumping = true;
+					}
 				}
-			}
+			}, true);
 
-			//MOVE BUNNY IN SERVER SIDE
-			if(moveLeft == true || moveRight == true){
+			window.addEventListener('keyup', function(evt){
+				//KEY A
+				if (evt.keyCode == 65 || evt.keyCode == 37) {
+					moveLeft = false;
+				}
+				//KEY D
+				if (evt.keyCode == 68 || evt.keyCode == 39) {
+					moveRight = false;
+				}
+			}, true);
+
+			//BUNNY JUMP
+			setInterval(function(){
+				//CHECK WALKING
+				if(moveLeft){
+					bunnyPosX -= xVel;
+					if(bunnyPosX < 0 - bunny.width){
+						bunnyPosX = c4.width;
+					}
+				}
+				if(moveRight){
+					bunnyPosX += xVel;
+					if(bunnyPosX > c4.width){
+						bunnyPosX = 0 - bunny.width;
+					}
+				}
+				//CHECK JUMPING
+				if(isJumping){
+					yVel += gravity;
+					bunnyPosY += yVel;
+				}
+
+				if(moveLeft || moveRight || isJumping){
+					ctx4.clearRect(0, 0, c4.width, c4.height);
+					bunny.onload();
+				}
+
+				//CHECK MOUNTAIN COLLISION
+				if( bunnyPosX + bunny.width/2 > mountainPos.x 
+					&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
+					&& bunnyPosY + bunny.height >= mountainPos.y
+					&& bunnyPosY + bunny.height <= mountainPos.y + mountainPos.height){
+					hasStage = true;
+				} else {
+					hasStage = false;
+				}
+
+				if(hasStage){
+					bunnyPosY = mountainPos.y - bunny.height;
+					yVel = 0;
+					isJumping = false;
+					ctx4.clearRect(0, 0, c4.width, c4.height);
+					bunny.onload();
+				} else if(isJumping == false){
+					yVel += gravity;
+					bunnyPosY += yVel;
+					ctx4.clearRect(0, 0, c4.width, c4.height);
+					bunny.onload();
+				}
+
+				//CHECK GAME OVER
+				if( bunnyPosY > c4.height ){			
+					bunnyPosX = 100;
+					bunnyPosY = 550;
+					yVel = 0;
+					isJumping = false;
+					ctx4.clearRect(0, 0, c4.width, c4.height);
+					bunny.onload();
+				}
+
+				//MOVE BUNNY IN SERVER SIDE
 				socket.emit('bunny', {
 					x: bunnyPosX,
 					y: bunnyPosY
 				});
-			}
+				
+			}, 50);
 		}
-	}, true);
-
-	window.addEventListener('keyup', function(evt){
-		if(name == 'bunny'){
-			//KEY A
-			if (evt.keyCode == 65 || evt.keyCode == 37) {
-				moveLeft = false;
-			}
-			//KEY D
-			if (evt.keyCode == 68 || evt.keyCode == 39) {
-				moveRight = false;
-			}
-		}
-	}, true);
-
-	//BUNNY JUMP
-	setInterval(function(){
-		//CHECK JUMPING
-		if(isJumping == true){
-			ctx4.clearRect(0, 0, c4.width, c4.height);
-			//MOVE X
-			if(moveLeft){
-				bunnyPosX -= xVel;
-				if(bunnyPosX < 0 - bunny.width){
-					bunnyPosX = c4.width;
-				}
-			}
-			if(moveRight){
-				bunnyPosX += xVel;
-				if(bunnyPosX > c4.width){
-					bunnyPosX = 0 - bunny.width;
-				}
-			}
-			yVel += gravity;
-			bunnyPosY += yVel;
-			bunny.onload();
-		}
-
-		//CHECK COLLISION
-		//CHECK MOUNTAIN IN CLIENT SIDE
-		// if( bunnyPosX + bunny.width/2 > mountainPos.x 
-		// 	&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
-		// 	&& bunnyPosY + bunny.height >= mountainPos.y){
-		// 	bunnyPosY = mountainPos.y - bunny.height;
-		// 	yVel = 0;
-		// 	isJumping = false;
-		// } 
-		// else if((bunnyPosX + bunny.width/2 < mountainPos.x
-		// 	|| bunnyPosX + bunny.width/2 > mountainPos.x + mountainPos.width)
-		// 	&& isJumping == false){
-		// 	console.log('falling');
-		// 	// yVel += gravity;
-		// 	// bunnyPosY += yVel;
-		// }
-
-		//CHECK GAME OVER
-		if( bunnyPosY > c4.height ){
-			ctx4.clearRect(0, 0, c4.width, c4.height);			bunnyPosX = 100;
-			bunnyPosY = 550;
-			yVel = 0;
-			isJumping = false;
-			bunny.onload();
-		}
-
-		//MOVE BUNNY IN SERVER SIDE
-		socket.emit('bunny jump', {
-			x: bunnyPosX,
-			y: bunnyPosY
-		});
-		
-	}, 50);
+	}();
 
 	//SOCKET IO
 	socket.on('start game', function(user){
@@ -263,13 +258,6 @@ app.init = function() {
 	});
 
 	socket.on('bunnyPos', function(data){
-		ctx4.clearRect(0, 0, c4.width, c4.height);
-		bunnyPosX = data.x;
-		bunnyPosY = data.y;
-		bunny.onload();
-	});
-
-	socket.on('jumpPos', function(data){
 		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
