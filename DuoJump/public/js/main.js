@@ -58,7 +58,11 @@ app.init = function() {
 	mountain.src = '/img/mountain.png';
 	mountain.onload = function() {
 		ctx1.drawImage(mountain, 0, 0);
-	};
+		// ctx1.fillRect(80, 698, 100, 20);
+	};	
+
+	//MOUNTAIN SUPPORT
+	var mountainPos = {x: 80, y: 698, width: 100, height: 20};
 
 	//CLOUD VAR
 	var cloudCount = [];
@@ -169,7 +173,7 @@ app.init = function() {
 				bunny.onload();
 				moveRight = true;
 			}
-
+			// SPACE BAR
 			if (evt.keyCode == 32) {
 				if(isJumping == false){
 					yVel = -15;
@@ -200,10 +204,10 @@ app.init = function() {
 	}, true);
 
 	//BUNNY JUMP
-	setInterval(function(){
+	setInterval(function(){		
+		//CHECK JUMPING
 		if(isJumping == true){
-			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
-			
+			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
 			//MOVE X
 			if(moveLeft){
 				bunnyPosX -= xVel;
@@ -217,23 +221,49 @@ app.init = function() {
 					bunnyPosX = 0 - bunny.width;
 				}
 			}
-			//MOVE Y
 			yVel += gravity;
-			bunnyPosY += yVel;
-			if(bunnyPosY > 550){
-				bunnyPosY = 550;
-				yVel = 0;
-				isJumping = false;
-			}
+			bunnyPosY += yVel;	
+
 			//MOVE BUNNY IN CLIENT SIDE
 			bunny.onload();
-
-			//MOVE BUNNY IN SERVER SIDE
-			socket.emit('bunny jump', {
-				x: bunnyPosX,
-				y: bunnyPosY
-			});
 		}
+
+		//CHECK COLLISION
+		//CHECK MOUNTAIN IN CLIENT SIDE
+		if( bunnyPosX + bunny.width/2 > mountainPos.x 
+			&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
+			&& bunnyPosY + bunny.height >= mountainPos.y){
+			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
+			bunnyPosY = mountainPos.y - bunny.height;
+			yVel = 0;
+			isJumping = false;
+			bunny.onload();
+		} else if((bunnyPosX + bunny.width/2 < mountainPos.x
+			|| bunnyPosX + bunny.width/2 > mountainPos.x + mountainPos.width)
+			&& isJumping == false){
+			console.log('falling');
+			// ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
+			// yVel += gravity;
+			// bunnyPosY += yVel;	
+			// bunny.onload();
+		}
+
+		//CHECK GAME OVER
+		if( bunnyPosY > c4.height ){
+			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
+			bunnyPosX = 100;
+			bunnyPosY = 550;
+			yVel = 0;
+			isJumping = false;
+			bunny.onload();
+		}
+
+		//MOVE BUNNY IN SERVER SIDE
+		socket.emit('bunny jump', {
+			x: bunnyPosX,
+			y: bunnyPosY
+		});
+		
 	}, 50);
 
 	//SOCKET IO
