@@ -117,24 +117,12 @@ app.init = function() {
 			cx = cx - cloudWidth/2; 
 			cy = cy - cloudHeight/2;
 
-			//ADD CLOUD IN SERVER SIDE
-			socket.emit('cloud', {
-				x: cx,
-				y: cy
-			});
-
-			//WHETHER REMOVE OLD ONE
 			cloudCount[cloudCount.length] = {x: cx, y: cy};
 
-			if(cloudCount.length > 2){
-				//REMOVE CLOUD IN SERVER SIDE
-				socket.emit('cloud remove', {
-					x: cloudCount[0].x,
-					y: cloudCount[0].y
-				});
-				//REMOVE ELEMENT FROM ARRAY
-				cloudCount.splice(0, 1);
-			}
+			//ADD CLOUD IN SERVER SIDE
+			socket.emit('cloud', {
+				cloud: cloudCount
+			});
 
 		} else {
 			console.log(name);
@@ -262,15 +250,16 @@ app.init = function() {
 	});
 
 	socket.on('cloudPos', function(data){
+		ctx3.clearRect(0, 0, c3.width, c3.height);
 		var cloud = new Image();
 		cloud.src = '/img/cloud.png';
 		cloud.onload = function() {
-			ctx3.drawImage(cloud, data.x, data.y);
+			ctx3.drawImage(cloud, data.cloud[0].x, data.cloud[0].y);
+			if(data.cloud.length > 1){
+				ctx3.drawImage(cloud, data.cloud[1].x, data.cloud[1].y);
+			}
 		};
-	});
-
-	socket.on('removePos', function(data){
-		ctx3.clearRect(data.x, data.y, cloudWidth, cloudHeight);
+		cloudCount = data.cloud;
 	});
 
 	socket.on('bunnyPos', function(data){

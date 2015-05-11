@@ -28,17 +28,14 @@ io.on('connection', function(socket){
 		}
 	});
 
-	socket.on('cloud', function(data){
-		io.emit('cloudPos', {
-			x: data.x,
-			y: data.y
-		});
-	});
+	socket.on('cloud', function(data){		
+		if(data.cloud.length > 2){
+			//REMOVE ELEMENT FROM ARRAY
+			data.cloud.splice(0, 1);
+		}
 
-	socket.on('cloud remove', function(data){
-		io.emit('removePos', {
-			x: data.x,
-			y: data.y
+		io.emit('cloudPos', {
+			cloud: data.cloud
 		});
 	});
 
