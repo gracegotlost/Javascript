@@ -62,7 +62,7 @@ app.init = function() {
 	};	
 
 	//MOUNTAIN SUPPORT
-	var mountainPos = {x: 80, y: 698, width: 100, height: 20};
+	var mountainPos = {x: 80, y: 698, width: 100, height: 30};
 
 	//CLOUD VAR
 	var cloudCount = [];
@@ -144,7 +144,7 @@ app.init = function() {
 				// SPACE BAR
 				if (evt.keyCode == 32) {
 					if(isJumping == false){
-						yVel = -15;
+						yVel = -20;
 						isJumping = true;
 					}
 				}
