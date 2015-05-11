@@ -187,18 +187,39 @@ app.init = function() {
 					bunny.onload();
 				}
 
-				//CHECK MOUNTAIN COLLISION
+				//CHECK COLLISION
+				var tempY = 0;
 				if( bunnyPosX + bunny.width/2 > mountainPos.x 
 					&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
 					&& bunnyPosY + bunny.height >= mountainPos.y
-					&& bunnyPosY + bunny.height <= mountainPos.y + mountainPos.height){
+					&& bunnyPosY + bunny.height <= mountainPos.y + mountainPos.height/2){
+					//MOUNTAIN
 					hasStage = true;
+					tempY = mountainPos.y;
+				} else if(cloudCount.length > 0){
+					//CLOUD
+					var i;
+					for(i = 0; i < cloudCount.length; i++){
+						if( bunnyPosX + bunny.width/2 > cloudCount[i].x
+							&& bunnyPosX + bunny.width/2 < cloudCount[i].x + cloudWidth
+							&& bunnyPosY + bunny.height >= cloudCount[i].y + cloudHeight/4
+							&& bunnyPosY + bunny.height <= cloudCount[i].y + cloudHeight/2){
+							hasStage = true;
+							tempY = cloudCount[i].y + cloudHeight/4;
+							break;
+						}
+					}
+					if(i == cloudCount.length){
+						hasStage = false;
+						tempY = 0;
+					}
 				} else {
 					hasStage = false;
+					tempY = 0;
 				}
 
 				if(hasStage){
-					bunnyPosY = mountainPos.y - bunny.height;
+					bunnyPosY = tempY - bunny.height;
 					yVel = 0;
 					isJumping = false;
 					ctx4.clearRect(0, 0, c4.width, c4.height);
