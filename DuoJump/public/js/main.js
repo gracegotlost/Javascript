@@ -192,7 +192,8 @@ app.init = function() {
 				if( bunnyPosX + bunny.width/2 > mountainPos.x 
 					&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
 					&& bunnyPosY + bunny.height >= mountainPos.y
-					&& bunnyPosY + bunny.height <= mountainPos.y + mountainPos.height/2){
+					&& bunnyPosY + bunny.height <= mountainPos.y + mountainPos.height/2
+					&& yVel >= 0){
 					//MOUNTAIN
 					hasStage = true;
 					tempY = mountainPos.y;
@@ -203,7 +204,8 @@ app.init = function() {
 						if( bunnyPosX + bunny.width/2 > cloudCount[i].x
 							&& bunnyPosX + bunny.width/2 < cloudCount[i].x + cloudWidth
 							&& bunnyPosY + bunny.height >= cloudCount[i].y + cloudHeight/4
-							&& bunnyPosY + bunny.height <= cloudCount[i].y + cloudHeight/2){
+							&& bunnyPosY + bunny.height <= cloudCount[i].y + cloudHeight/2
+							&& yVel >= 0){
 							hasStage = true;
 							tempY = cloudCount[i].y + cloudHeight/4;
 							break;
