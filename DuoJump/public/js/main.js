@@ -71,7 +71,9 @@ app.init = function() {
 
 	//BUNNY INIT
 	var bunnyPosX = 100,
-		bunnyPosY = 550;
+		bunnyPosY = 550,
+		oldBunnyPosX = 100,
+		oldBunnyPosY = 550;
 	var bunny = new Image();
 	bunny.src = '/img/bunny.png';
 	bunny.onload = function() {
@@ -114,15 +116,8 @@ app.init = function() {
 	 		var cx = evt.clientX - container.left * (c3.width  / container.width),
 		        cy = evt.clientY - container.top  * (c3.height / container.height)
 
-			cx = cx - cloudWidth/2; //cloud.width
-			cy = cy - cloudHeight/2;  //cloud.height
-
-		    var cloud = new Image();
-			cloud.src = '/img/cloud.png';
-			cloud.onload = function() {
-				//ADD CLOUD IN CLIENT SIDE
-				ctx3.drawImage(cloud, cx, cy);
-			};
+			cx = cx - cloudWidth/2; 
+			cy = cy - cloudHeight/2;
 
 			//ADD CLOUD IN SERVER SIDE
 			socket.emit('cloud', {
@@ -134,8 +129,6 @@ app.init = function() {
 			cloudCount[cloudCount.length] = {x: cx, y: cy};
 
 			if(cloudCount.length > 2){
-				//REMOVE CLOUD IN CLIENT SIDE
-				ctx3.clearRect(cloudCount[0].x, cloudCount[0].y, cloud.width, cloud.height);
 				//REMOVE CLOUD IN SERVER SIDE
 				socket.emit('cloud remove', {
 					x: cloudCount[0].x,
@@ -152,25 +145,22 @@ app.init = function() {
 
 	window.addEventListener('keydown', function(evt){
 		if(name == 'bunny'){
-			//MOVE BUNNY IN CLIENT SIDE
 			// KEY A
+			oldBunnyPosX = bunnyPosX;
+			oldBunnyPosY = bunnyPosY;
 			if ( evt.keyCode == 65 || evt.keyCode == 37 ) {
-				ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
 				bunnyPosX -= xVel ;
 				if(bunnyPosX < 0 - bunny.width){
 					bunnyPosX = c4.width;
 				}
-				bunny.onload();
 				moveLeft = true;
 			}
 			// KEY D
 			if ( evt.keyCode == 68 || evt.keyCode == 39) {
-				ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
 				bunnyPosX += xVel ;
 				if(bunnyPosX > c4.width){
 					bunnyPosX = 0 - bunny.width;
 				}
-				bunny.onload();
 				moveRight = true;
 			}
 			// SPACE BAR
@@ -179,14 +169,17 @@ app.init = function() {
 					yVel = -15;
 					isJumping = true;
 				}
-				// console.log("space bar is pressed");
 			}
 
 			//MOVE BUNNY IN SERVER SIDE
-			socket.emit('bunny', {
-				x: bunnyPosX,
-				y: bunnyPosY
-			});
+			if(moveLeft == true || moveRight == true){
+				socket.emit('bunny', {
+					oldx: oldBunnyPosX,
+					oldy: oldBunnyPosY,
+					x: bunnyPosX,
+					y: bunnyPosY
+				});
+			}
 		}
 	}, true);
 
@@ -205,9 +198,10 @@ app.init = function() {
 
 	//BUNNY JUMP
 	setInterval(function(){		
+		var tempx = bunnyPosX,
+			tempy = bunnyPosY;
 		//CHECK JUMPING
 		if(isJumping == true){
-			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
 			//MOVE X
 			if(moveLeft){
 				bunnyPosX -= xVel;
@@ -222,44 +216,38 @@ app.init = function() {
 				}
 			}
 			yVel += gravity;
-			bunnyPosY += yVel;	
-
-			//MOVE BUNNY IN CLIENT SIDE
-			bunny.onload();
+			bunnyPosY += yVel;
 		}
 
 		//CHECK COLLISION
 		//CHECK MOUNTAIN IN CLIENT SIDE
-		if( bunnyPosX + bunny.width/2 > mountainPos.x 
-			&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
-			&& bunnyPosY + bunny.height >= mountainPos.y){
-			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
-			bunnyPosY = mountainPos.y - bunny.height;
-			yVel = 0;
-			isJumping = false;
-			bunny.onload();
-		} else if((bunnyPosX + bunny.width/2 < mountainPos.x
-			|| bunnyPosX + bunny.width/2 > mountainPos.x + mountainPos.width)
-			&& isJumping == false){
-			console.log('falling');
-			// ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
-			// yVel += gravity;
-			// bunnyPosY += yVel;	
-			// bunny.onload();
-		}
+		// if( bunnyPosX + bunny.width/2 > mountainPos.x 
+		// 	&& bunnyPosX + bunny.width/2 < mountainPos.x + mountainPos.width
+		// 	&& bunnyPosY + bunny.height >= mountainPos.y){
+		// 	bunnyPosY = mountainPos.y - bunny.height;
+		// 	yVel = 0;
+		// 	isJumping = false;
+		// } 
+		// else if((bunnyPosX + bunny.width/2 < mountainPos.x
+		// 	|| bunnyPosX + bunny.width/2 > mountainPos.x + mountainPos.width)
+		// 	&& isJumping == false){
+		// 	console.log('falling');
+		// 	// yVel += gravity;
+		// 	// bunnyPosY += yVel;
+		// }
 
 		//CHECK GAME OVER
 		if( bunnyPosY > c4.height ){
-			ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);			
 			bunnyPosX = 100;
 			bunnyPosY = 550;
 			yVel = 0;
 			isJumping = false;
-			bunny.onload();
 		}
 
 		//MOVE BUNNY IN SERVER SIDE
 		socket.emit('bunny jump', {
+			oldx: tempx,
+			oldy: tempy,
 			x: bunnyPosX,
 			y: bunnyPosY
 		});
@@ -286,7 +274,6 @@ app.init = function() {
 		cloud.onload = function() {
 			ctx3.drawImage(cloud, data.x, data.y);
 		};
-		// console.log(data.x + ' ' + data.y);
 	});
 
 	socket.on('removePos', function(data){
@@ -294,14 +281,14 @@ app.init = function() {
 	});
 
 	socket.on('bunnyPos', function(data){
-		ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
+		ctx4.clearRect(data.oldx, data.oldy, bunny.width, bunny.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
 		bunny.onload();
 	});
 
 	socket.on('jumpPos', function(data){
-		ctx4.clearRect(bunnyPosX, bunnyPosY, bunny.width, bunny.height);
+		ctx4.clearRect(data.oldx, data.oldy, bunny.width, bunny.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
 		bunny.onload();

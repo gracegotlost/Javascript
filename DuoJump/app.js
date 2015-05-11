@@ -29,28 +29,32 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('cloud', function(data){
-		socket.broadcast.emit('cloudPos', {
+		io.emit('cloudPos', {
 			x: data.x,
 			y: data.y
 		});
 	});
 
 	socket.on('cloud remove', function(data){
-		socket.broadcast.emit('removePos', {
+		io.emit('removePos', {
 			x: data.x,
 			y: data.y
 		});
 	});
 
 	socket.on('bunny', function(data){
-		socket.broadcast.emit('bunnyPos', {
+		io.emit('bunnyPos', {
+			oldx: data.oldx,
+			oldy: data.oldy,
 			x: data.x,
 			y: data.y
 		});
 	});
 
 	socket.on('bunny jump', function(data){
-		socket.broadcast.emit('jumpPos', {
+		io.emit('jumpPos', {
+			oldx: data.oldx,
+			oldy: data.oldy,
 			x: data.x,
 			y: data.y
 		});
