@@ -71,9 +71,7 @@ app.init = function() {
 
 	//BUNNY INIT
 	var bunnyPosX = 100,
-		bunnyPosY = 550,
-		oldBunnyPosX = 100,
-		oldBunnyPosY = 550;
+		bunnyPosY = 550;
 	var bunny = new Image();
 	bunny.src = '/img/bunny.png';
 	bunny.onload = function() {
@@ -146,8 +144,6 @@ app.init = function() {
 	window.addEventListener('keydown', function(evt){
 		if(name == 'bunny'){
 			// KEY A
-			oldBunnyPosX = bunnyPosX;
-			oldBunnyPosY = bunnyPosY;
 			if ( evt.keyCode == 65 || evt.keyCode == 37 ) {
 				bunnyPosX -= xVel ;
 				if(bunnyPosX < 0 - bunny.width){
@@ -174,8 +170,6 @@ app.init = function() {
 			//MOVE BUNNY IN SERVER SIDE
 			if(moveLeft == true || moveRight == true){
 				socket.emit('bunny', {
-					oldx: oldBunnyPosX,
-					oldy: oldBunnyPosY,
 					x: bunnyPosX,
 					y: bunnyPosY
 				});
@@ -197,11 +191,10 @@ app.init = function() {
 	}, true);
 
 	//BUNNY JUMP
-	setInterval(function(){		
-		var tempx = bunnyPosX,
-			tempy = bunnyPosY;
+	setInterval(function(){
 		//CHECK JUMPING
 		if(isJumping == true){
+			ctx4.clearRect(0, 0, c4.width, c4.height);
 			//MOVE X
 			if(moveLeft){
 				bunnyPosX -= xVel;
@@ -217,6 +210,7 @@ app.init = function() {
 			}
 			yVel += gravity;
 			bunnyPosY += yVel;
+			bunny.onload();
 		}
 
 		//CHECK COLLISION
@@ -238,16 +232,15 @@ app.init = function() {
 
 		//CHECK GAME OVER
 		if( bunnyPosY > c4.height ){
-			bunnyPosX = 100;
+			ctx4.clearRect(0, 0, c4.width, c4.height);			bunnyPosX = 100;
 			bunnyPosY = 550;
 			yVel = 0;
 			isJumping = false;
+			bunny.onload();
 		}
 
 		//MOVE BUNNY IN SERVER SIDE
 		socket.emit('bunny jump', {
-			oldx: tempx,
-			oldy: tempy,
 			x: bunnyPosX,
 			y: bunnyPosY
 		});
@@ -281,14 +274,14 @@ app.init = function() {
 	});
 
 	socket.on('bunnyPos', function(data){
-		ctx4.clearRect(data.oldx, data.oldy, bunny.width, bunny.height);
+		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
 		bunny.onload();
 	});
 
 	socket.on('jumpPos', function(data){
-		ctx4.clearRect(data.oldx, data.oldy, bunny.width, bunny.height);
+		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
 		bunny.onload();

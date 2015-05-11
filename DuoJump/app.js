@@ -44,17 +44,13 @@ io.on('connection', function(socket){
 
 	socket.on('bunny', function(data){
 		io.emit('bunnyPos', {
-			oldx: data.oldx,
-			oldy: data.oldy,
 			x: data.x,
 			y: data.y
 		});
 	});
 
 	socket.on('bunny jump', function(data){
-		io.emit('jumpPos', {
-			oldx: data.oldx,
-			oldy: data.oldy,
+		socket.broadcast.emit('jumpPos', {
 			x: data.x,
 			y: data.y
 		});
