@@ -66,8 +66,10 @@ app.init = function() {
 
 	//CLOUD VAR
 	var cloudCount = [];
-	var cloudWidth = 170;
-	var cloudHeight = 98;
+	var cloudWidth = 170, cloudHeight = 98;
+	var cloudImg = new Image();
+	cloudImg.src = '/img/cloud.png';
+	cloudImg.onload = function() {};
 
 	//BUNNY INIT
 	var bunnyPosX = 100,
@@ -269,15 +271,11 @@ app.init = function() {
 	});
 
 	socket.on('cloudPos', function(data){
-		ctx3.clearRect(0, 0, c3.width, c3.height);
-		var cloud = new Image();
-		cloud.src = '/img/cloud.png';
-		cloud.onload = function() {
-			ctx3.drawImage(cloud, data.cloud[0].x, data.cloud[0].y);
-			if(data.cloud.length > 1){
-				ctx3.drawImage(cloud, data.cloud[1].x, data.cloud[1].y);
-			}
-		};
+		if(data.cloud.length > 2){
+			//REMOVE ELEMENT FROM ARRAY
+			ctx3.clearRect(data.cloud[0].x-10, data.cloud[0].y-10, cloudWidth+20, cloudHeight+20);
+			data.cloud.splice(0, 1);
+		}
 		cloudCount = data.cloud;
 	});
 
@@ -287,6 +285,20 @@ app.init = function() {
 		bunnyPosY = data.y;
 		bunny.onload();
 	});
+
+	setInterval(function() {
+		// clear all the existing cloud images
+		for (var i = 0; i < cloudCount.length; i ++) {
+			ctx3.clearRect(cloudCount[i].x, cloudCount[i].y, cloudWidth, cloudHeight);
+		}	
+
+		// draw new cloud images
+		for (var i = 0; i < cloudCount.length; i++) {
+			cloudCount[i].y++;
+			ctx3.drawImage(cloudImg, cloudCount[i].x, cloudCount[i].y);
+		}
+	}, 50);
+	
 	
 };
 

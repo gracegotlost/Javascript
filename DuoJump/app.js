@@ -29,11 +29,6 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('cloud', function(data){		
-		if(data.cloud.length > 2){
-			//REMOVE ELEMENT FROM ARRAY
-			data.cloud.splice(0, 1);
-		}
-
 		io.emit('cloudPos', {
 			cloud: data.cloud
 		});
