@@ -271,7 +271,7 @@ app.init = function() {
 	});
 
 	socket.on('cloudPos', function(data){
-		if(data.cloud.length > 2){
+		while(data.cloud.length > 2){
 			//REMOVE ELEMENT FROM ARRAY
 			ctx3.clearRect(data.cloud[0].x-10, data.cloud[0].y-10, cloudWidth+20, cloudHeight+20);
 			data.cloud.splice(0, 1);
