@@ -30,14 +30,26 @@ io.on('connection', function(socket){
 
 	socket.on('cloud', function(data){		
 		io.emit('cloudPos', {
-			cloud: data.cloud
+			cloudCount: data.cloudCount
 		});
 	});
 
 	socket.on('bunny', function(data){
+		// console.log("server received");
 		socket.broadcast.emit('bunnyPos', {
 			x: data.x,
 			y: data.y
+		});
+	});
+
+	socket.on('reset', function(data){
+		// console.log("server received");
+		socket.broadcast.emit('resetPos', {
+			x: data.x,
+			y: data.y,
+			y1: data.y1,
+			y2: data.y2,
+			cloudCount: data.cloudCount
 		});
 	});
 });

@@ -55,9 +55,10 @@ app.init = function() {
 
 	//MOUNTAIN INIT
 	var mountain = new Image();
+	var mountainPosY = 0;
 	mountain.src = '/img/mountain.png';
 	mountain.onload = function() {
-		ctx1.drawImage(mountain, 0, 0);
+		ctx1.drawImage(mountain, 0, mountainPosY);
 		// ctx1.fillRect(80, 698, 100, 20);
 	};	
 
@@ -125,7 +126,7 @@ app.init = function() {
 
 				//ADD CLOUD IN SERVER SIDE
 				socket.emit('cloud', {
-					cloud: cloudCount
+					cloudCount: cloudCount
 				});
 			}, false);
 		}
@@ -237,20 +238,38 @@ app.init = function() {
 				}
 
 				//CHECK GAME OVER
-				if( bunnyPosY > c4.height ){			
-					bunnyPosX = 100;
-					bunnyPosY = 550;
+				if( bunnyPosY > c4.height ){
+					//GAME INIT			
 					yVel = 0;
 					isJumping = false;
+					//MOUNTAIN INIT
+					ctx1.clearRect(0, 0, c1.width, c1.height);
+					mountainPosY = 0;
+					mountainPos.y = 698;
+					mountain.onload();
+					//CLOUD INIT
+					ctx3.clearRect(0, 0, c3.width, c3.height);
+					cloudCount.splice(0, cloudCount.length);
+					//BUNNY INIT
 					ctx4.clearRect(0, 0, c4.width, c4.height);
+					bunnyPosX = 100;
+					bunnyPosY = 550;
 					bunny.onload();
-				}
 
-				//MOVE BUNNY IN SERVER SIDE
-				socket.emit('bunny', {
-					x: bunnyPosX,
-					y: bunnyPosY
-				});
+					socket.emit('reset', {
+						x: bunnyPosX,
+						y: bunnyPosY,
+						y1: mountainPosY,
+						y2: mountainPos.y,
+						cloudCount: cloudCount
+					});
+				} else {
+					//MOVE BUNNY IN SERVER SIDE
+					socket.emit('bunny', {
+						x: bunnyPosX,
+						y: bunnyPosY
+					});
+				}	
 				
 			}, 50);
 		}
@@ -271,15 +290,31 @@ app.init = function() {
 	});
 
 	socket.on('cloudPos', function(data){
-		while(data.cloud.length > 2){
+		while(data.cloudCount.length > 2){
 			//REMOVE ELEMENT FROM ARRAY
-			ctx3.clearRect(data.cloud[0].x-10, data.cloud[0].y-10, cloudWidth+20, cloudHeight+20);
-			data.cloud.splice(0, 1);
+			ctx3.clearRect(data.cloudCount[0].x-10, data.cloudCount[0].y-10, cloudWidth+20, cloudHeight+20);
+			data.cloudCount.splice(0, 1);
 		}
-		cloudCount = data.cloud;
+		cloudCount = data.cloudCount;
 	});
 
 	socket.on('bunnyPos', function(data){
+		ctx4.clearRect(0, 0, c4.width, c4.height);
+		bunnyPosX = data.x;
+		bunnyPosY = data.y;
+		bunny.onload();
+	});
+
+	socket.on('resetPos', function(data){
+		//MOUNTAIN INIT
+		ctx1.clearRect(0, 0, c1.width, c1.height);
+		mountainPosY = data.y1;
+		mountainPos.y = data.y2;
+		mountain.onload();
+		//CLOUD INIT
+		ctx3.clearRect(0, 0, c3.width, c3.height);
+		cloudCount = data.cloudCount;
+		//BUNNY INIT
 		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
@@ -294,8 +329,18 @@ app.init = function() {
 
 		// draw new cloud images
 		for (var i = 0; i < cloudCount.length; i++) {
-			cloudCount[i].y++;
+			cloudCount[i].y += 2;
 			ctx3.drawImage(cloudImg, cloudCount[i].x, cloudCount[i].y);
+		}
+
+		//move mountain
+		if(cloudCount.length != 0){
+			if(mountainPosY < c3.height){
+				ctx1.clearRect(0, mountainPosY, mountain.width, mountain.height);
+				mountainPosY += 2;
+				mountainPos.y += 2;
+				ctx1.drawImage(mountain, 0, mountainPosY);
+			}	
 		}
 	}, 50);
 	
