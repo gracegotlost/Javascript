@@ -61,4 +61,8 @@ io.on('connection', function(socket){
 			cloudCount: data.cloudCount
 		});
 	});
+
+	socket.on('gameover', function(data){
+		socket.broadcast.emit('gameoverText');
+	});
 });

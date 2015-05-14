@@ -48,10 +48,14 @@ app.init = function() {
 
 	//BG INIT
 	var restart = false;
+	var score = 0;
+	var scoreAdded = false;
 	var background = new Image();
 	background.src = './img/bg.png';
 	background.onload = function() {
 		ctx0.drawImage(background, 0, 0);
+		ctx0.font="40px Helvetica Neue";
+		// ctx0.fillText("Score: " + score, c0.width - 100, 50);
 	};
 
 	//MOUNTAIN INIT
@@ -224,6 +228,10 @@ app.init = function() {
 							&& yVel >= 0){
 							hasStage = true;
 							tempY = cloudCount[i].y + cloudHeight/4;
+							if(scoreAdded == false){
+								score++;
+								scoreAdded = true;
+							}
 							break;
 						}
 					}
@@ -269,11 +277,21 @@ app.init = function() {
 
 				//CHECK GAME OVER
 				if( bunnyPosY > c4.height || isHit == true){
+					//GAME OVER
+					ctx0.fillText("GAME OVER", c0.width/2 - 100, c0.height/2 - 100);
+					socket.emit('gameover');
+					setTimeout(function(){ 
+						ctx0.clearRect(0, 0, c0.width, c0.height);
+						ctx0.drawImage(background, 0, 0);
+					}, 1000);
 					//GAME INIT			
 					yVel = 0;
 					isJumping = false;
 					isHit = false;
 					restart = false;
+					score = 0;
+					scoreAdded = false;
+					// ctx0.fillText("Score: " + score, c0.width - 100, 50);
 					//MOUNTAIN INIT
 					ctx1.clearRect(0, 0, c1.width, c1.height);
 					mountainPosY = 0;
@@ -370,6 +388,14 @@ app.init = function() {
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
 		bunny.onload();
+	});
+
+	socket.on('gameoverText', function(){
+		ctx0.fillText("GAME OVER", c0.width/2 - 100, c0.height/2 - 100);
+		setTimeout(function(){ 
+			ctx0.clearRect(0, 0, c0.width, c0.height);
+			ctx0.drawImage(background, 0, 0);
+		}, 1000);
 	});
 
 	setInterval(function() {
