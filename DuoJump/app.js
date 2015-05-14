@@ -34,6 +34,13 @@ io.on('connection', function(socket){
 		});
 	});
 
+	socket.on('crow', function(data){
+		io.emit('crowPos', {
+			crowCount: data.crowCount,
+			crowSpeed: data.crowSpeed
+		});
+	});
+
 	socket.on('bunny', function(data){
 		// console.log("server received");
 		socket.broadcast.emit('bunnyPos', {
@@ -49,6 +56,8 @@ io.on('connection', function(socket){
 			y: data.y,
 			y1: data.y1,
 			y2: data.y2,
+			crowCount: data.crowCount,
+			crowSpeed: data.crowSpeed,
 			cloudCount: data.cloudCount
 		});
 	});

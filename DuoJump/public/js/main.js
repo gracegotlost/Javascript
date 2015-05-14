@@ -47,6 +47,7 @@ app.init = function() {
 	center(windowWidth);
 
 	//BG INIT
+	var restart = false;
 	var background = new Image();
 	background.src = './img/bg.png';
 	background.onload = function() {
@@ -65,12 +66,22 @@ app.init = function() {
 	//MOUNTAIN SUPPORT
 	var mountainPos = {x: 80, y: 698, width: 100, height: 30};
 
-	//CLOUD VAR
+	//CLOUD INIT
 	var cloudCount = [];
 	var cloudWidth = 170, cloudHeight = 98;
 	var cloudImg = new Image();
 	cloudImg.src = '/img/cloud.png';
 	cloudImg.onload = function() {};
+
+	//CROW INIT
+	var crowCount = [];
+	var crowSpeed = [];
+	var timeCount = 0;
+	var max_TimeCount = Math.floor(Math.random() * 100);
+	var isHit = false;
+	var crowImg = new Image();
+	crowImg.src = '/img/crow.png';
+	crowImg.onload = function() {};
 
 	//BUNNY INIT
 	var bunnyPosX = 100,
@@ -105,6 +116,8 @@ app.init = function() {
 			socket.emit('join game', {
 				username: name
 			});
+
+			restart = true;
 		});
 
 	};
@@ -223,6 +236,23 @@ app.init = function() {
 					tempY = 0;
 				}
 
+				//CHECK ABSTOCLE
+				if(crowCount.length > 0) {
+					//CROW
+					var i;
+					for (i = 0; i < crowCount.length; i++) {
+						if( bunnyPosX + bunny.width > crowCount[i].x
+							&& bunnyPosX < crowCount[i].x + crowImg.width
+							&& bunnyPosY < crowCount[i].y + crowImg.height 
+							&& bunnyPosY + bunny.height > crowCount[i].y
+							){
+							isHit = true;
+							// console.log("is hit");
+							break;
+						}
+					}
+				}
+
 				if(hasStage){
 					bunnyPosY = tempY - bunny.height;
 					yVel = 0;
@@ -238,15 +268,21 @@ app.init = function() {
 				}
 
 				//CHECK GAME OVER
-				if( bunnyPosY > c4.height ){
+				if( bunnyPosY > c4.height || isHit == true){
 					//GAME INIT			
 					yVel = 0;
 					isJumping = false;
+					isHit = false;
+					restart = false;
 					//MOUNTAIN INIT
 					ctx1.clearRect(0, 0, c1.width, c1.height);
 					mountainPosY = 0;
 					mountainPos.y = 698;
 					mountain.onload();
+					//CROW INIT
+					ctx2.clearRect(0, 0, c2.width, c2.height);
+					crowCount.splice(0, crowCount.length);
+					crowSpeed.splice(0, crowSpeed.length);
 					//CLOUD INIT
 					ctx3.clearRect(0, 0, c3.width, c3.height);
 					cloudCount.splice(0, cloudCount.length);
@@ -261,6 +297,8 @@ app.init = function() {
 						y: bunnyPosY,
 						y1: mountainPosY,
 						y2: mountainPos.y,
+						crowCount: crowCount,
+						crowSpeed: crowSpeed,
 						cloudCount: cloudCount
 					});
 				} else {
@@ -298,6 +336,15 @@ app.init = function() {
 		cloudCount = data.cloudCount;
 	});
 
+	socket.on('crowPos', function(data){
+		while(data.crowCount.x < 0 - crow.width){
+			data.crowCount.splice(0, 1);
+			data.crowSpeed.splice(0, 1);
+		}
+		crowCount = data.crowCount;
+		crowSpeed = data.crowSpeed;
+	});
+
 	socket.on('bunnyPos', function(data){
 		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
@@ -311,6 +358,10 @@ app.init = function() {
 		mountainPosY = data.y1;
 		mountainPos.y = data.y2;
 		mountain.onload();
+		//CROW INIT
+		ctx2.clearRect(0, 0, c2.width, c2.height);
+		crowCount = data.crowCount;
+		crowSpeed = data.crowSpeed;
 		//CLOUD INIT
 		ctx3.clearRect(0, 0, c3.width, c3.height);
 		cloudCount = data.cloudCount;
@@ -342,6 +393,45 @@ app.init = function() {
 				ctx1.drawImage(mountain, 0, mountainPosY);
 			}	
 		}
+
+		//generate crow
+		if(cloudCount.length != 0){
+			if(timeCount > max_TimeCount){
+				//move crow
+				for (var i = 0; i < crowCount.length; i++){
+					ctx2.clearRect(crowCount[i].x, crowCount[i].y, crow.width, crow.height);
+				}
+
+				for (var i = 0; i < crowCount.length; i++){
+					crowCount[i].x -= crowSpeed[i];
+					ctx2.drawImage(crowImg, crowCount[i].x, crowCount[i].y);
+				}
+				//add new crow
+				crowCount[crowCount.length] = {x: c2.width, y: Math.floor(Math.random() * c2.height)};
+				crowSpeed[crowSpeed.length] = Math.floor(Math.random() * 5 + 1);
+				//send to server side
+				socket.emit('crow', {
+					crowCount: crowCount,
+					crowSpeed: crowSpeed
+				});
+				timeCount = 0;
+				max_TimeCount = Math.floor(Math.random() * 500 + 100);
+			} else {
+				//move crow
+				for (var i = 0; i < crowCount.length; i++){
+					ctx2.clearRect(crowCount[i].x, crowCount[i].y, crow.width, crow.height);
+				}
+
+				for (var i = 0; i < crowCount.length; i++){
+					crowCount[i].x -= crowSpeed[i];
+					ctx2.drawImage(crowImg, crowCount[i].x, crowCount[i].y);
+				}
+
+				timeCount++;
+			}
+		}
+
+
 	}, 50);
 	
 	
