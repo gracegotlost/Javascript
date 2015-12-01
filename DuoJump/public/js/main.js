@@ -204,6 +204,8 @@ app.init = function() {
 
 				if(moveLeft || moveRight || isJumping){
 					ctx4.clearRect(0, 0, c4.width, c4.height);
+					// if(moveLeft) bunny.src = '/img/bunnyleft.png';
+					// if(moveRight) bunny.src = '/img/bunny.png';
 					bunny.onload();
 				}
 
@@ -311,6 +313,8 @@ app.init = function() {
 					bunny.onload();
 
 					socket.emit('reset', {
+						// moveLeft: moveLeft,
+						// moveRight: moveRight,
 						x: bunnyPosX,
 						y: bunnyPosY,
 						y1: mountainPosY,
@@ -322,6 +326,8 @@ app.init = function() {
 				} else {
 					//MOVE BUNNY IN SERVER SIDE
 					socket.emit('bunny', {
+						// moveLeft: moveLeft,
+						// moveRight: moveRight,
 						x: bunnyPosX,
 						y: bunnyPosY
 					});
@@ -367,6 +373,8 @@ app.init = function() {
 		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
+		// if(data.moveLeft) bunny.src = '/img/bunnyleft.png';
+		// if(data.moveRight) bunny.src = '/img/bunny.png';
 		bunny.onload();
 	});
 
@@ -387,6 +395,8 @@ app.init = function() {
 		ctx4.clearRect(0, 0, c4.width, c4.height);
 		bunnyPosX = data.x;
 		bunnyPosY = data.y;
+		// if(data.moveLeft) bunny.src = '/img/bunnyleft.png';
+		// if(data.moveRight) bunny.src = '/img/bunny.png';
 		bunny.onload();
 	});
 

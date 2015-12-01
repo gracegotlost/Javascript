@@ -44,6 +44,8 @@ io.on('connection', function(socket){
 	socket.on('bunny', function(data){
 		// console.log("server received");
 		socket.broadcast.emit('bunnyPos', {
+			// moveLeft: data.moveLeft,
+			// moveRight: data.moveRight,
 			x: data.x,
 			y: data.y
 		});
@@ -52,6 +54,8 @@ io.on('connection', function(socket){
 	socket.on('reset', function(data){
 		// console.log("server received");
 		socket.broadcast.emit('resetPos', {
+			// moveLeft: data.moveLeft,
+			// moveRight: data.moveRight,
 			x: data.x,
 			y: data.y,
 			y1: data.y1,
